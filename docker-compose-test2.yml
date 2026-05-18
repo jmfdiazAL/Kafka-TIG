@@ -43,9 +43,19 @@ services:
         networks:
             - kafka
 
+    mosquitto:
+        image: eclipse-mosquitto:latest
+        container_name: mosquitto
+        ports:
+            - "1883:1883"
+        volumes:
+            - ./conf/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+        networks:
+            - kafka
+
     ### DATABASE
     influxdb:
-        image: influxdb:latest
+        image: influxdb:2
         container_name: influxdb
         ports:
             - "8083:8083"
@@ -76,12 +86,13 @@ services:
             - zookeeper
             - influxdb
             - kafka1
+            - mosquitto
         restart: unless-stopped
         networks:
             - kafka
             - db
         volumes:
-            - ./conf/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+            - ./conf/telegraf/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
 
     grafana:
         image: grafana/grafana
@@ -91,8 +102,9 @@ services:
             - GF_SECURITY_ADMIN_PASSWORD=1234
         ports:
             - "3000:3000"
-        #  volumes: 
-        #      - ./grafana/data:/var/lib/grafana
+        volumes:
+            - ./grafana/data:/var/lib/grafana
+            - ./conf/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
         networks:
             - grafana
             - db
