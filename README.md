@@ -17,7 +17,8 @@ are required for all the components.
 ### Send Sensor Data
 
 - run the Python script `SendTempPressure.py` present in the folder DataSender/SendTempPressure.py. This script sends the random temperature and pressure values every 5 sec to the Kafka topic.
-  
+- run the MQTT demo script `SendTempPressureMQTT.py` present in the folder DataSender/SendTempPressureMQTT.py. This publishes the same JSON data to MQTT topics for Telegraf ingestion.
+
 ## Environment Variables & Configuration Files
 
 ### Authentication
@@ -36,6 +37,7 @@ are required for all the components.
 
 - Adapt the `topics`, `database` in the `conf/telegraf/telegraf.conf` according to your requirements
 - In the current project two topics are created in the Kafka broker i.e; "states1" and "states2"
+- MQTT support is available via `[[inputs.mqtt_consumer]]` in `conf/telegraf/telegraf.conf`; it listens on the `mosquitto` broker at `tcp://mosquitto:1883` and can ingest JSON messages from topics like `states/temperature` and `states/pressure`.
 
 
 ## Steps to Bring the Kafka-TIG Stack Up and Down
@@ -57,8 +59,9 @@ are required for all the components.
 
 | `KafDrop` | none                                                | Browser: `http://localhost:9000`|
 
+| `mosquitto` | none | Broker: `tcp://localhost:1883` |
 
-| `influxdb`| `influx-admin:ThisIsNotThePasswordYouAreLookingFor` | Browser: `http://localhost:8086`|
+| `influxdb`| `admin:Admin.123` | Browser: `http://localhost:8086`|
 
 | `grafana`| `admin:1234` | Browser: `http://localhost:3000`|
 
@@ -152,7 +155,8 @@ Here we can see the data present in the Kafka Topic. Here states1 and states2 ar
 
 ![image](https://github.com/eternalamit5/Kafka-TIG/assets/44448083/33cd9e5c-65f5-457e-a8ca-ed24b4c4b4d7)
 
-- Configure the database source as InfluxDB and create a dashboard as per your need.
+- Grafana now auto-loads the InfluxDB datasource from `conf/grafana/provisioning/datasources/influxdb.yml` at startup.
+- Configure dashboards or panels as needed using the pre-provisioned InfluxDB data source.
 
   ![image](https://github.com/eternalamit5/Kafka-TIG/assets/44448083/d4d7a67d-3d18-497f-b3b2-cc80b2f4615d)
 
